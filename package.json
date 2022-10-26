@@ -1,0 +1,32 @@
+{
+  "name": "crc-cardbook",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "13.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "18.11.5",
+    "@types/react": "18.0.23",
+    "@types/react-dom": "18.0.7",
+    "@types/uuid": "^8.3.4",
+    "autoprefixer": "^10.4.12",
+    "eslint": "^8.26.0",
+    "eslint-config-next": "13.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "postcss": "^8.4.18",
+    "prettier": "^2.7.1",
+    "tailwindcss": "^3.2.1",
+    "typescript": "4.8.4"
+  }
+}
