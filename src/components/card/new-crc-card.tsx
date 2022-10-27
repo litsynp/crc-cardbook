@@ -1,10 +1,38 @@
-import { memo, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 import CircleButton from '../common/circle-button'
+import CollaboratorList from './collaborator-list'
+import ResponsibilityList from './responsibility-list'
 import { CRCCardType } from './types'
 
 const CONFIRM_BG_COLOR = 'rgb(23 165 137)'
+
+const NewResponsibilityBtn = ({
+  addEmptyResponsibility,
+}: {
+  addEmptyResponsibility: () => void
+}) => <CircleButton text="+" onClick={addEmptyResponsibility} />
+
+const NewCollaboratorBtn = ({
+  addEmptyCollaborator,
+}: {
+  addEmptyCollaborator: () => void
+}) => <CircleButton text="+" onClick={addEmptyCollaborator} />
+
+const ConfirmButton = ({
+  card,
+  onConfirm,
+}: {
+  card: CRCCardType
+  onConfirm: (card: CRCCardType) => void
+}) => (
+  <CircleButton
+    backgroundColor={CONFIRM_BG_COLOR}
+    text="V"
+    onClick={() => onConfirm(card)}
+  />
+)
 
 const NewCRCCard = ({
   onConfirm,
@@ -14,132 +42,6 @@ const NewCRCCard = ({
   const [candidate, setCandidate] = useState('')
   const [responsibilities, setResponsibilities] = useState<string[]>([])
   const [collaborators, setCollaborators] = useState<string[]>([])
-
-  const ResponsibilityInput = memo<{
-    responsibility: string
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  }>(
-    ({ responsibility, onChange }) => (
-      <input
-        className="w-full focus:outline-none"
-        value={responsibility}
-        onChange={onChange}
-        placeholder="New responsibility"
-      />
-    ),
-    (prevProps, nextProps) =>
-      prevProps.responsibility !== nextProps.responsibility,
-  )
-
-  const CollaboratorInput = memo<{
-    collaborator: string
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  }>(
-    ({ collaborator, onChange }) => (
-      <input
-        className="w-full focus:outline-none"
-        value={collaborator}
-        onChange={onChange}
-        placeholder="New collaborator"
-      />
-    ),
-    (prevProps, nextProps) => prevProps.collaborator !== nextProps.collaborator,
-  )
-
-  const RemoveResponsibilityBtn = ({ index }: { index: number }) => (
-    <CircleButton
-      backgroundColor="gray"
-      text="X"
-      onClick={() => {
-        setResponsibilities(responsibilities.filter((_, i) => i !== index))
-      }}
-    />
-  )
-
-  const RemoveCollaboratorBtn = ({ index }: { index: number }) => (
-    <CircleButton
-      backgroundColor="gray"
-      text="X"
-      onClick={() => {
-        setCollaborators(collaborators.filter((_, i) => i !== index))
-      }}
-    />
-  )
-
-  const NewResponsibilityBtn = () => (
-    <CircleButton
-      text="+"
-      onClick={() => setResponsibilities(responsibilities.concat(''))}
-    />
-  )
-
-  const NewCollaboratorBtn = () => (
-    <CircleButton
-      text="+"
-      onClick={() => setCollaborators(collaborators.concat(''))}
-    />
-  )
-
-  const ConfirmBtn = () => (
-    <CircleButton
-      backgroundColor={CONFIRM_BG_COLOR}
-      text="V"
-      onClick={() =>
-        onConfirm({
-          id: uuidv4(),
-          candidate,
-          responsibilities,
-          collaborators,
-        })
-      }
-    />
-  )
-
-  const ResponsibilityList = () => (
-    <>
-      {responsibilities.map((responsibility, index) => (
-        <div key={`r_${index}`} className="flex px-8 py-4">
-          <ResponsibilityInput
-            responsibility={responsibility}
-            onChange={(e) => {
-              setResponsibilities(
-                responsibilities.map((c, i) => {
-                  if (i === index) {
-                    return e.target.value
-                  }
-                  return c
-                }),
-              )
-            }}
-          />
-          <RemoveResponsibilityBtn index={index} />
-        </div>
-      ))}
-    </>
-  )
-
-  const CollaboratorList = () => (
-    <>
-      {collaborators.map((collaborator, index) => (
-        <div key={`c_${index}`} className="flex px-8 py-4">
-          <CollaboratorInput
-            onChange={(e) =>
-              setCollaborators(
-                collaborators.map((c, i) => {
-                  if (i === index) {
-                    return e.target.value
-                  }
-                  return c
-                }),
-              )
-            }
-            collaborator={collaborator}
-          />
-          <RemoveCollaboratorBtn index={index} />
-        </div>
-      ))}
-    </>
-  )
 
   return (
     <div className="mx-auto w-[70%] bg-white drop-shadow-xl text-slate-700 divide-y-2 border-slate-200">
@@ -155,22 +57,70 @@ const NewCRCCard = ({
       </div>
       <div className="flex flex-shrink-0 divide-x-2">
         <div className="w-full divide-y-2 border-slate-200">
-          <ResponsibilityList />
+          <ResponsibilityList
+            responsibilities={responsibilities}
+            onChange={(e, index) => {
+              setResponsibilities(
+                responsibilities.map((c, i) => {
+                  if (i === index) {
+                    return e.target.value
+                  }
+                  return c
+                }),
+              )
+            }}
+            onClickRemoveBtn={(index) =>
+              setResponsibilities(
+                responsibilities.filter((_, i) => i !== index),
+              )
+            }
+          />
         </div>
         <div className="w-full divide-y-2 border-slate-200">
-          <CollaboratorList />
+          <CollaboratorList
+            collaborators={collaborators}
+            onChange={(e, index) =>
+              setCollaborators(
+                collaborators.map((c, i) => {
+                  if (i === index) {
+                    return e.target.value
+                  }
+                  return c
+                }),
+              )
+            }
+            onClickRemoveBtn={(index) => {
+              setCollaborators(collaborators.filter((_, i) => i !== index))
+            }}
+          />
         </div>
       </div>
       <div className="flex divide-x-2 border-slate-200">
         <div className="w-full px-8 py-4">
-          <NewResponsibilityBtn />
+          <NewResponsibilityBtn
+            addEmptyResponsibility={() =>
+              setResponsibilities(responsibilities.concat(''))
+            }
+          />
         </div>
         <div className="w-full px-8 py-4">
-          <NewCollaboratorBtn />
+          <NewCollaboratorBtn
+            addEmptyCollaborator={() =>
+              setCollaborators(collaborators.concat(''))
+            }
+          />
         </div>
       </div>
       <div className="w-full px-8 py-4">
-        <ConfirmBtn />
+        <ConfirmButton
+          card={{
+            id: uuidv4(),
+            candidate,
+            responsibilities,
+            collaborators,
+          }}
+          onConfirm={onConfirm}
+        />
       </div>
     </div>
   )
